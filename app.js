@@ -131,12 +131,116 @@ class QuranClass extends HTMLElement {
     self.stylesheet     = createElement("style");
 
     self.stylesheet.innerText = `
-    	:host *{
+    	:host{
+      	display:inline-block;
+        background:white;
+        padding-left: 10px;
+        padding-right: 10px;
+        border-radius: 5px;
+        direction: rtl;
+      }
+    	:host *:not(style){
       	vertical-align: middle;
+        height: 26px;
+        background: white;
+        display:inline-block;
+        margin: 3px;
+      }
+      :host label{
+      	line-height: 25px;
+      }
+      input[type=range] {
+        height: 26px;
+        -webkit-appearance: none;
+        margin: 10px 0;
+        align: center;
+      }
+      input[type=range]:focus {
+        outline: none;
+      }
+      input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 10px;
+        cursor: pointer;
+        animate: 0.2s;
+        box-shadow: 0px 0px 0px #000000;
+        background: #F2F2F2;
+        border-radius: 50px;
+        border: 0px solid #000000;
+      }
+      input[type=range]::-webkit-slider-thumb {
+        box-shadow: 0px 0px 1px #636363;
+        border: 0px solid #000000;
+        height: 20px;
+        width: 20px;
+        border-radius: 50px;
+        background: #FFFFFF;
+        cursor: pointer;
+        -webkit-appearance: none;
+        margin-top: -5px;
+      }
+      input[type=range]:focus::-webkit-slider-runnable-track {
+        background: #F2F2F2;
+      }
+      input[type=range]::-moz-range-track {
+        width: 100%;
+        height: 10px;
+        cursor: pointer;
+        animate: 0.2s;
+        box-shadow: 0px 0px 0px #000000;
+        background: #F2F2F2;
+        border-radius: 50px;
+        border: 0px solid #000000;
+      }
+      input[type=range]::-moz-range-thumb {
+        box-shadow: 0px 0px 1px #636363;
+        border: 0px solid #000000;
+        height: 20px;
+        width: 20px;
+        border-radius: 50px;
+        background: #FFFFFF;
+        cursor: pointer;
+      }
+      input[type=range]::-ms-track {
+        width: 100%;
+        height: 10px;
+        cursor: pointer;
+        animate: 0.2s;
+        background: transparent;
+        border-color: transparent;
+        color: transparent;
+      }
+      input[type=range]::-ms-fill-lower {
+        background: #F2F2F2;
+        border: 0px solid #000000;
+        border-radius: 100px;
+        box-shadow: 0px 0px 0px #000000;
+      }
+      input[type=range]::-ms-fill-upper {
+        background: #F2F2F2;
+        border: 0px solid #000000;
+        border-radius: 100px;
+        box-shadow: 0px 0px 0px #000000;
+      }
+      input[type=range]::-ms-thumb {
+        margin-top: 1px;
+        box-shadow: 0px 0px 1px #636363;
+        border: 0px solid #000000;
+        height: 20px;
+        width: 20px;
+        border-radius: 50px;
+        background: #FFFFFF;
+        cursor: pointer;
+      }
+      input[type=range]:focus::-ms-fill-lower {
+        background: #F2F2F2;
+      }
+      input[type=range]:focus::-ms-fill-upper {
+        background: #F2F2F2;
       }
     `;
 
-    self.playButton.innerHTML = "Play";
+    self.playButton.innerHTML = "تشغيل";
     self.playButton.onclick = () => {
         self.play();
     }
@@ -165,7 +269,7 @@ class QuranClass extends HTMLElement {
         self.played.currentTime = self.rangeInput.value;
     };
 
-    self.label.innerText    = "00:00:00 / 00:00:00";
+    self.label.innerText    = "00:00:00 < 00:00:00";
 
 
     fetch("https://cors-anywhere.herokuapp.com/http://mp3quran.net/api/_arabic.json").then(e => e.json()).then(r => {
@@ -174,6 +278,7 @@ class QuranClass extends HTMLElement {
 
 
     self.root.append(self.stylesheet, self.playButton, ' ', self.selectInput, self.rangeInput, self.label);
+    self.load();
   }
 
   play(){
@@ -204,11 +309,11 @@ class QuranClass extends HTMLElement {
     self.played = new Audio(url);
     
     self.played.addEventListener('canplaythrough', ()=>{
-        self.label.innerHTML        = self.fancyTimeFormat(self.played.currentTime) + " / " + self.fancyTimeFormat(self.played.duration);
+        self.label.innerHTML        = self.fancyTimeFormat(self.played.currentTime) + " < " + self.fancyTimeFormat(self.played.duration);
         self.rangeInput.max         = ~~self.played.duration;
         self.rangeInput.value       = ~~self.played.currentTime;
         setInterval(()=>{
-            self.label.innerHTML    = self.fancyTimeFormat(self.played.currentTime) + " / " + self.fancyTimeFormat(self.played.duration);
+            self.label.innerHTML    = self.fancyTimeFormat(self.played.currentTime) + " < " + self.fancyTimeFormat(self.played.duration);
             self.rangeInput.value   = ~~self.played.currentTime;
         },800);
     }, false);
