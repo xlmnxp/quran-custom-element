@@ -167,6 +167,7 @@ class QuranClass extends HTMLElement {
         background: white;
         display:inline-block;
         margin: 3px;
+        outline: 0;
       }
       :host label{
       	line-height: 25px;
