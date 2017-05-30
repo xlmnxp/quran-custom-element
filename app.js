@@ -127,9 +127,11 @@ class QuranClass extends HTMLElement {
     self.playButton     = createElement('button');
     self.selectInput    = createElement('select');
     self.rangeInput     = createElement("input");
-    self.label          = createElement("label");
+    self.currentLabel		= createElement("label");
+    self.durationLabel	= createElement("label");
     self.stylesheet     = createElement("style");
-
+    
+		self.durationLabel.className = "duration";
     self.stylesheet.innerText = `
     	:host{
       	display:inline-block;
@@ -138,6 +140,26 @@ class QuranClass extends HTMLElement {
         padding-right: 10px;
         border-radius: 5px;
         direction: rtl;
+      }
+      :host label.duration {
+        background: #F2F2F2;
+        border: 1px solid #F2F2F2;
+        padding-left: 8px;
+        padding-right: 8px;
+        border-radius: 5px;
+      }
+      :host select{
+        border: 1px solid rgba(194, 194, 194, 0.1);
+        background: rgba(0, 0, 0, 0.03) !important;
+        border-radius: 5px;
+        padding: 0 16px;
+        margin-left: 10px !important;
+      }
+      :host button{
+          border: 0px;
+      }
+      :host button:active{
+          padding-bottom: 3px;
       }
     	:host *:not(style){
       	vertical-align: middle;
@@ -148,12 +170,12 @@ class QuranClass extends HTMLElement {
       }
       :host label{
       	line-height: 25px;
+				margin-right: 10px !important;
       }
       input[type=range] {
         height: 26px;
         -webkit-appearance: none;
         margin: 10px 0;
-        align: center;
       }
       input[type=range]:focus {
         outline: none;
@@ -269,15 +291,15 @@ class QuranClass extends HTMLElement {
         self.played.currentTime = self.rangeInput.value;
     };
 
-    self.label.innerText    = "00:00:00 < 00:00:00";
-
+    self.currentLabel.innerText		= "00:00:00";
+		self.durationLabel.innerText	= "00:00:00";
 
     fetch("https://cors-anywhere.herokuapp.com/http://mp3quran.net/api/_arabic.json").then(e => e.json()).then(r => {
       console.log(r);
     });
 
 
-    self.root.append(self.stylesheet, self.playButton, ' ', self.selectInput, self.rangeInput, self.label);
+    self.root.append(self.stylesheet, self.playButton, ' ', self.selectInput, self.rangeInput, self.currentLabel,self.durationLabel);
     self.load();
   }
 
@@ -309,11 +331,14 @@ class QuranClass extends HTMLElement {
     self.played = new Audio(url);
     
     self.played.addEventListener('canplaythrough', ()=>{
-        self.label.innerHTML        = self.fancyTimeFormat(self.played.currentTime) + " < " + self.fancyTimeFormat(self.played.duration);
+        self.currentLabel.innerText	= self.fancyTimeFormat(self.played.currentTime);
+        self.durationLabel.innerText = self.fancyTimeFormat(self.played.duration);
         self.rangeInput.max         = ~~self.played.duration;
         self.rangeInput.value       = ~~self.played.currentTime;
         setInterval(()=>{
-            self.label.innerHTML    = self.fancyTimeFormat(self.played.currentTime) + " < " + self.fancyTimeFormat(self.played.duration);
+            self.currentLabel.innerText	= self.fancyTimeFormat(self.played.currentTime);
+        		self.durationLabel.innerText = self.fancyTimeFormat(self.played.duration);
+            
             self.rangeInput.value   = ~~self.played.currentTime;
         },800);
     }, false);
