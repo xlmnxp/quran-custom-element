@@ -7,6 +7,7 @@ class QuranClass extends HTMLElement {
     const createElement = e => document.createElement(e),
       self = this;
     self.played = null;
+    self.pause = false;
     self.soar = {
       '001': 'الفاتحة',
       '002': 'البقرة',
@@ -125,14 +126,18 @@ class QuranClass extends HTMLElement {
     };
 
     self.playButton     = createElement('button');
+    self.nextButton     = createElement('button');
     self.selectInput    = createElement('select');
+    self.previousButton = createElement('button');
     self.rangeInput     = createElement("input");
     self.currentLabel		= createElement("label");
     self.durationLabel	= createElement("label");
     self.stylesheet     = createElement("style");
     
-		self.durationLabel.className = "duration";
-    self.stylesheet.innerText = `
+		self.durationLabel.className  = "duration";
+    self.previousButton.className = "changebuttons";
+    self.nextButton.className     = "changebuttons";
+    self.stylesheet.innerText     = `
     	:host{
       	display:inline-block;
         background:white;
@@ -140,6 +145,18 @@ class QuranClass extends HTMLElement {
         padding-right: 10px;
         border-radius: 5px;
         direction: rtl;
+      }
+
+      .changebuttons{
+        height: 25px;
+        background: #FCFCFC;
+        width: 25px;
+        border-radius: 15px;
+        border: 1px dashed #F2F2F2;
+        line-height: 15px;
+        margin-left: 1px;
+        margin-right: 1px;
+        color: #CCCCCC;
       }
       :host label.duration {
         background: #F2F2F2;
@@ -153,10 +170,10 @@ class QuranClass extends HTMLElement {
         background: rgba(0, 0, 0, 0.03) !important;
         border-radius: 5px;
         padding: 0 16px;
-        margin-left: 10px !important;
       }
       :host button{
           border: 0px;
+          cursor: pointer;
       }
       :host button:active{
           padding-bottom: 3px;
@@ -268,6 +285,18 @@ class QuranClass extends HTMLElement {
         self.play();
     }
 
+    self.previousButton.innerText = '«';
+    self.previousButton.onclick   = ()=>{
+      
+      if(self.selectInput.selectedIndex <= 0)
+      {
+        self.selectInput.selectedIndex = 1;
+      }
+      
+      self.selectInput.selectedIndex -= 1;
+      self.selectInput.onchange();
+    }
+
     for (var k = 0; k < Object.keys(self.soar).length; k++) {
       var optionInput       = createElement("option");
       
@@ -279,9 +308,22 @@ class QuranClass extends HTMLElement {
 
     self.selectInput.onchange = ()=>{
         self.load();
-        self.played.currentTime = 0;
-        self.rangeInput.max     = 0;
-        self.rangeInput.value   = 0;
+        self.playButton.innerText = "تشغيل";
+        self.pause                = false;
+        self.played.currentTime   = 0;
+        self.rangeInput.max       = 0;
+        self.rangeInput.value     = 0;
+    }
+
+    self.nextButton.innerText = '»';
+    self.nextButton.onclick   = ()=>{
+      if(self.selectInput.selectedIndex == self.selectInput.options.length-1)
+      {
+        self.selectInput.selectedIndex = self.selectInput.options.length-2;
+      }
+
+      self.selectInput.selectedIndex += 1;
+      self.selectInput.onchange();
     }
 
     self.rangeInput.type    = "range";
@@ -300,7 +342,7 @@ class QuranClass extends HTMLElement {
     });
 
 
-    self.root.append(self.stylesheet, self.playButton, ' ', self.selectInput, self.rangeInput, self.currentLabel,self.durationLabel);
+    self.root.append(self.stylesheet, self.playButton, ' ', self.previousButton, self.selectInput, self.nextButton, ' ', self.rangeInput, self.currentLabel,self.durationLabel);
     self.load();
   }
 
@@ -315,8 +357,16 @@ class QuranClass extends HTMLElement {
     if(self.played == null){
         self.load();
     }
-
     self.played.play();
+    if(self.pause == false){
+      self.playButton.innerText = "ايقاف";
+      self.played.play();
+      self.pause = true;
+    }else{
+      self.playButton.innerText = "استئناف";      
+      self.played.pause();
+      self.pause = false;
+    }
   }
 
   load(){
