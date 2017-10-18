@@ -124,7 +124,8 @@ class QuranClass extends HTMLElement {
       '113': 'الفلق',
       '114': 'النّاس'
     };
-
+    
+    self.checkInput     = createElement("input");
     self.playButton     = createElement('button');
     self.nextButton     = createElement('button');
     self.selectInput    = createElement('select');
@@ -132,14 +133,16 @@ class QuranClass extends HTMLElement {
     self.rangeInput     = createElement("input");
     self.currentLabel		= createElement("label");
     self.durationLabel	= createElement("label");
+    self.ayat						= createElement('div');
     self.stylesheet     = createElement("style");
     
 		self.durationLabel.className  = "duration";
     self.previousButton.className = "changebuttons";
     self.nextButton.className     = "changebuttons";
+    self.ayat.className						= "ayat";
     self.stylesheet.innerText     = `
     	:host{
-      	display:inline-block;
+      	display:block;
         background:white;
         padding-left: 10px;
         padding-right: 10px;
@@ -278,8 +281,23 @@ class QuranClass extends HTMLElement {
       input[type=range]:focus::-ms-fill-upper {
         background: #F2F2F2;
       }
+      .ayat{
+        display: inline-block;
+        font-family: Amiri;
+        word-wrap: break-word; 
+        height: 100%;
+        color: darkgreen;
+        border: 1px solid rgba(194, 194, 194, 0.1);
+        background: rgba(0, 0, 0, 0.03) !important;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 8px;
+      }
     `;
-
+		
+    self.checkInput.type = "checkbox";
+    self.checkInput.checked = true;
+    
     self.playButton.innerHTML = "تشغيل";
     self.playButton.onclick = () => {
         self.play();
@@ -300,8 +318,8 @@ class QuranClass extends HTMLElement {
     for (var k = 0; k < Object.keys(self.soar).length; k++) {
       var optionInput       = createElement("option");
       
-      optionInput.innerHTML = self.soar[self.n000(k + 1)];
-      optionInput.value     = self.n000(k + 1);
+      optionInput.innerHTML = self.soar[self.ayatFormatNumber(k + 1)];
+      optionInput.value     = self.ayatFormatNumber(k + 1);
       
       self.selectInput.append(optionInput);
     }
@@ -342,7 +360,7 @@ class QuranClass extends HTMLElement {
     });
 
 
-    self.root.append(self.stylesheet, self.playButton, ' ', self.previousButton, self.selectInput, self.nextButton, ' ', self.rangeInput, self.currentLabel,self.durationLabel);
+    self.root.append(self.stylesheet, self.checkInput, self.playButton, ' ', self.previousButton, self.selectInput, self.nextButton, ' ', self.rangeInput, self.currentLabel, self.durationLabel, self.ayat);
     self.load();
   }
 
@@ -371,7 +389,15 @@ class QuranClass extends HTMLElement {
 
   load(){
     const self = this;
-    var url = "http://server10.mp3quran.net/ibrahim_dosri_hafs/"+self.selectInput.value+".mp3";
+    var url = "http://server10.mp3quran.net/ibrahim_dosri_hafs/"+ self.selectInput.value +".mp3";
+    var ayat = "https://runbb.github.io/quran-data/quran/"+ self.selectInput.value +".txt";
+    
+    fetch(ayat).then(result => result.text()).then(ayats => {
+    	self.ayat.innerHTML = ayats;
+    })
+    .catch(()=>{
+    	alert('لا يمكن تحميل الأيات')
+    });
     
     try{
         self.played.pause();
@@ -382,6 +408,20 @@ class QuranClass extends HTMLElement {
     self.played = new Audio(url);
     
     self.played.addEventListener('canplaythrough', ()=>{
+    		if(self.checkInput.checked){
+        	self.pause == false;
+          if(self.pause == false){
+            self.playButton.innerText = "ايقاف";
+            self.played.play();
+            self.pause = true;
+          }else{
+            self.playButton.innerText = "استئناف";      
+            self.played.pause();
+            self.pause = false;
+          }
+        }
+    
+    
         self.currentLabel.innerText	= self.fancyTimeFormat(self.played.currentTime);
         self.durationLabel.innerText = self.fancyTimeFormat(self.played.duration);
         self.rangeInput.max         = ~~self.played.duration;
@@ -393,7 +433,6 @@ class QuranClass extends HTMLElement {
             self.rangeInput.value   = ~~self.played.currentTime;
         },800);
     }, false);
-    
   }
 
   fancyTimeFormat(time) {
@@ -418,7 +457,7 @@ class QuranClass extends HTMLElement {
     return ret;
   }
 
-  n000(n) {
+  ayatFormatNumber(n) {
     var s = "000";
     var stn = n.toString();
     s = s.substring(0, s.length - stn.length);
