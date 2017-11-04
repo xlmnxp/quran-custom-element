@@ -1,9 +1,7 @@
 class QuranClass extends HTMLElement {
   constructor() {
     super();
-    this.root = this.attachShadow({
-      mode: 'closed'
-    });
+    this.root = this;
     const createElement = e => document.createElement(e),
       self = this;
     self.played = null;
@@ -141,7 +139,7 @@ class QuranClass extends HTMLElement {
     self.nextButton.className     = "changebuttons";
     self.ayat.className						= "ayat";
     self.stylesheet.innerText     = `
-    	:host{
+    	quran-widght{
       	display:block;
         background:white;
         padding-left: 10px;
@@ -161,27 +159,28 @@ class QuranClass extends HTMLElement {
         margin-right: 1px;
         color: #CCCCCC;
       }
-      :host label.duration {
+      quran-widght label.duration {
         background: #F2F2F2;
         border: 1px solid #F2F2F2;
         padding-left: 8px;
         padding-right: 8px;
         border-radius: 5px;
       }
-      :host select{
+      quran-widght select{
         border: 1px solid rgba(194, 194, 194, 0.1);
         background: rgba(0, 0, 0, 0.03) !important;
         border-radius: 5px;
         padding: 0 16px;
+        width:120px;
       }
-      :host button{
+      quran-widght button{
           border: 0px;
           cursor: pointer;
       }
-      :host button:active{
+      quran-widght button:active{
           padding-bottom: 3px;
       }
-    	:host *:not(style){
+    	quran-widght *:not(style){
       	vertical-align: middle;
         height: 26px;
         background: white;
@@ -189,7 +188,7 @@ class QuranClass extends HTMLElement {
         margin: 3px;
         outline: 0;
       }
-      :host label{
+      quran-widght label{
       	line-height: 25px;
 				margin-right: 10px !important;
       }
@@ -296,6 +295,7 @@ class QuranClass extends HTMLElement {
     `;
 		
     self.checkInput.type = "checkbox";
+    self.checkInput.setAttribute('title','التشغيل تلقائيًا');
     self.checkInput.checked = true;
     
     self.playButton.innerHTML = "تشغيل";
