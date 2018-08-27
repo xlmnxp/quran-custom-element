@@ -390,7 +390,7 @@ class QuranClass extends HTMLElement {
   load(){
     const self = this;
     var url = "http://server10.mp3quran.net/ibrahim_dosri_hafs/"+ self.selectInput.value +".mp3";
-    var ayat = "https://runbb.github.io/quran-data/quran/"+ self.selectInput.value +".txt";
+    var ayat = "https://xlmnxp.github.io/quran-data/quran/"+ self.selectInput.value +".txt";
     
     fetch(ayat).then(result => result.text()).then(ayats => {
     	self.ayat.innerHTML = ayats;
